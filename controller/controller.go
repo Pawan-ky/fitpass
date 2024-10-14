@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type UserPlan struct {
-	UserID       int `json:"user_id"`       // Use capital 'ID' for consistency
-	PlanDuration int `json:"plan_duration"` // Capitalized field names
+	UserID       int `json:"user_id"`       
+	PlanDuration int `json:"plan_duration"` 
 }
 
 func GetUsers(ctx *gin.Context) {
@@ -62,7 +63,7 @@ func AddUserPlan(ctx *gin.Context) {
 		ctx.JSON(404, gin.H{"error": "user not found"})
 		return
 	}
-	expiryDate := time.Now().AddDate(0, req.PlanDuration, 0)
+	expiryDate := time.Now().AddDate(0, 0, req.PlanDuration*30)
 
 	// Create the new subscription
 	subscription := models.Subscription{
@@ -80,4 +81,21 @@ func AddUserPlan(ctx *gin.Context) {
 	// Return a success response
 	ctx.JSON(200, gin.H{"message": "subscription added successfully", "subscription": subscription})
 
+}
+
+func GetUserSubscription(ctx *gin.Context) {
+    userIDParam := ctx.Query("user_id")
+    id,_ := strconv.ParseUint(userIDParam, 10, 64)
+	fmt.Println("id. ------", id)
+	userID := uint(id)
+    var subscription models.Subscription
+    if err := db.Instance.Where("user_id = ?", userID).Preload("User").First(&subscription).Error; err != nil {
+        if err == gorm.ErrRecordNotFound {
+            ctx.JSON(404, gin.H{"error": "no subscription found for this user"})
+        } else {
+            ctx.JSON(500, gin.H{"error": "failed to fetch subscription"})
+        }
+        return
+    }
+    ctx.JSON(200, subscription)
 }

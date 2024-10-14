@@ -25,5 +25,5 @@ type Subscription struct {
     
     // One-to-one relationship
     UserID uint  `json:"user_id"`
-    User   User  `gorm:"OnDelete:CASCADE;" json:"user"`
+    User   User  `gorm:"OnDelete:CASCADE;" json:"user,omitempty"`
 }

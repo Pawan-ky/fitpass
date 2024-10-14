@@ -12,4 +12,5 @@ func AllRoutes(incomingRoutes *gin.RouterGroup) {
 	incomingRoutes.POST("add-user", controller.AddUser)
 	incomingRoutes.DELETE("delete-user", controller.DeleteUser)
 	incomingRoutes.POST("subscribe", controller.AddUserPlan)
+	incomingRoutes.GET("get-subscription-plan", controller.GetUserSubscription)
 }
